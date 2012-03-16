@@ -1,0 +1,109 @@
+Phase:	First
+Input: Token Lookup Split
+Options: control = appelt debug = false
+/*
+0 = Person
+1 = Organization
+2 = Facility
+3 = Vessel
+4 = Location - natural and man-made features, including political entities such as municipalities.
+5 = Vehicle
+6 = Street
+*/
+Macro: SPACE
+// space
+// control
+// space control
+// control space
+
+( 
+ ({SpaceToken.kind == space}
+  ({SpaceToken.kind == control})?
+  ({SpaceToken.kind == control})?
+ )
+|
+ ({SpaceToken.kind == control}
+  ({SpaceToken.kind == control})?
+  ({SpaceToken.kind == space})?
+ )
+)
+
+Macro:PROPER
+(
+	{Token.orth == "upperInitial", Token.category =~ "[NN|NNP|NNPS|NNS|NP|NPS|JJ]", Token.kind == "word", Token.length > 1, !Lookup.majorType == "company_ending"}|
+	{Token.orth == "allCaps", Token.category =~ "N[N|NP|NPS|NS|P|PS]", Token.kind == "word", Token.length > 1, Token.string != "AKA", Token.string != "IVO",!Lookup.majorType == "company_ending"}|
+	{Token.orth == "mixedCaps", Token.category =~ "N[N|NP|NPS|NS|P|PS]", Token.kind == "word", Token.length > 1, !Lookup.majorType == "company_ending"}|
+	(
+		({Token.orth == upperInitial, Token.length =="1", Token.category != "DT"})
+		({Token.string == "."})?
+	)
+)
+
+Macro:MILITARYNAME
+(
+   (
+    {Token.string == "("}
+    {Token.string == "("}
+   )
+  ({Token.string != ")"})+
+  (
+   {Token.string == ")"}
+   {Token.string == ")"}
+  )
+)
+
+Macro: PERSONENDING
+(
+ {Lookup.majorType == person_ending}
+)
+
+Macro: PREFIX
+(
+ {Lookup.majorType == surnameprefix}
+ ({Token.string == "-"}|{Token.string == "'"}|{Token.string == "’"})?
+)
+
+Macro:  COMPANYENDING
+// company_ending is something like "Inc." or "Ltd"
+(
+ ({Lookup.majorType == company_ending})+
+  ({Token.string == ","})?
+  ({Lookup.majorType == company_ending})[0,2]
+)
+
+///////////////////////////////////////////////////////////
+
+Rule: CorePersonNameMilitary
+(
+ (PROPER)[0,4]
+ (PREFIX)?
+ (MILITARYNAME)[1,3]
+ (PERSONENDING)?
+):person
+-->
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+gate.AnnotationSet orgAS = (gate.AnnotationSet)bindings.get("person");
+//gate.Annotation orgAnn = (gate.Annotation)orgAS.iterator().next();
+features.put("rule", "CorePersonNameMilitary");
+outputAS.add(orgAS.firstNode(), orgAS.lastNode(), "Person", features);
+//outputAS.removeAll(orgAS);
+}
+
+Rule: CoreName
+(
+ (PROPER)[0,4]
+ (PREFIX)?
+ (PROPER)[1,4]
+ (PERSONENDING)?
+):person
+-->
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+gate.AnnotationSet orgAS = (gate.AnnotationSet)bindings.get("person");
+//gate.Annotation orgAnn = (gate.Annotation)orgAS.iterator().next();
+features.put("rule", "CoreName");
+outputAS.add(orgAS.firstNode(), orgAS.lastNode(), "CoreName", features);
+//outputAS.removeAll(orgAS);
+}
+

@@ -1,0 +1,235 @@
+Phase:	Stats
+Input: Person Organization Facility Token Location
+Options: control = appelt
+
+Rule: OrgProps
+(
+	({Token})? :pre1
+	({Token})? :pre2
+	({Organization}):entity
+	({Token})? :post1
+	({Token})? :post2
+)
+-->
+{
+	gate.AnnotationSet personAS;
+	gate.Annotation personAnn;
+	int start_offset = 0;
+	int end_offset = 0;
+	String outStr1 = "";
+	String outStr2 = "";
+	String outStr3 = "";
+	String outStr4 = "";
+	String outStr5 = "";
+	
+	personAS = (gate.AnnotationSet)bindings.get("pre1");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr1 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("pre2");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr2 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("entity");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr3 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("post1");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr4 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("post2");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr5 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+        System.out.println("Organization" + "`" + outStr1 + "`" + outStr2 + "`" + outStr3 + "`" + outStr4 + "`" + outStr5);
+}
+
+Rule: PersonProps
+(
+	({Token})? :pre1
+	({Token})? :pre2
+	({Person}):entity
+	({Token})? :post1
+	({Token})? :post2
+)
+-->
+{
+	gate.AnnotationSet personAS;
+	gate.Annotation personAnn;
+	int start_offset = 0;
+	int end_offset = 0;
+	String outStr1 = "";
+	String outStr2 = "";
+	String outStr3 = "";
+	String outStr4 = "";
+	String outStr5 = "";
+	
+	personAS = (gate.AnnotationSet)bindings.get("pre1");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr1 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("pre2");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr2 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("entity");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr3 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("post1");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr4 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("post2");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr5 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+        System.out.println("Person" + "`" + outStr1 + "`" + outStr2 + "`" + outStr3 + "`" + outStr4 + "`" + outStr5);
+}
+
+Rule: FacilityProps
+(
+	({Token})? :pre1
+	({Token})? :pre2
+	({Facility}):entity
+	({Token})? :post1
+	({Token})? :post2
+)
+-->
+{
+	gate.AnnotationSet personAS;
+	gate.Annotation personAnn;
+	int start_offset = 0;
+	int end_offset = 0;
+	String outStr1 = "";
+	String outStr2 = "";
+	String outStr3 = "";
+	String outStr4 = "";
+	String outStr5 = "";
+	
+	personAS = (gate.AnnotationSet)bindings.get("pre1");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr1 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("pre2");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr2 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("entity");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr3 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("post1");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr4 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("post2");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr5 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+        System.out.println("Facility" + "`" + outStr1 + "`" + outStr2 + "`" + outStr3 + "`" + outStr4 + "`" + outStr5);
+}
+
+Rule: LocationProps
+(
+	({Token})? :pre1
+	({Token})? :pre2
+	({Location}):entity
+	({Token})? :post1
+	({Token})? :post2
+)
+-->
+{
+	gate.AnnotationSet personAS;
+	gate.Annotation personAnn;
+	int start_offset = 0;
+	int end_offset = 0;
+	String outStr1 = "";
+	String outStr2 = "";
+	String outStr3 = "";
+	String outStr4 = "";
+	String outStr5 = "";
+	
+	personAS = (gate.AnnotationSet)bindings.get("pre1");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr1 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("pre2");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr2 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("entity");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr3 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("post1");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr4 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+	personAS = (gate.AnnotationSet)bindings.get("post2");
+	if (personAS != null) {
+		personAnn = (gate.Annotation)personAS.iterator().next();
+		start_offset = personAnn.getStartNode().getOffset().intValue();
+		end_offset = personAnn.getEndNode().getOffset().intValue();
+		outStr5 = doc.getContent().toString().substring(start_offset, end_offset);
+        }
+        System.out.println("Location" + "`" + outStr1 + "`" + outStr2 + "`" + outStr3 + "`" + outStr4 + "`" + outStr5);
+}

@@ -1,0 +1,1059 @@
+Phase:	Post
+Input: Token Lookup Title TempDate Split JobTitle CoreName
+Options: control = all debug = false
+
+Macro:  COMPANYENDING
+// company_ending is something like "Inc." or "Ltd"
+(
+ ({Lookup.majorType == company_ending})[1,2]
+  ({Token.string == ","})?
+  ({Lookup.majorType == company_ending})[0,2]
+)
+
+Rule: PersonPostKey
+({CoreName}):person
+({Token.string == ","})?
+({Lookup.majorType == "person_postkey"}):post
+-->
+{
+	String wgtStr;
+	int wgt = 0;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	personAS = (gate.AnnotationSet)bindings.get("person");
+	personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",PersonPostKey");
+	} else {
+		features.put("rule", "PersonPostKey");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[0] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[0].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[0] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule: PersonPostJobTitle
+({CoreName}):person
+({Token.string == ","})?
+({Token.category == "DT"})?
+({Token.category == "JJ"})[0,3]
+({JobTitle}):post
+-->
+{
+	String wgtStr;
+	int wgt = 27;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.FeatureMap features2 = Factory.newFeatureMap();
+	gate.AnnotationSet postAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation postAnn = (gate.Annotation)postAS.iterator().next();
+	if (postAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(postAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",PersonPostJobTitle");
+	} else {
+		features.put("rule", "PersonPostJobTitle");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[0] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[0].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[0] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);
+		features2.put("rule", "PersonPostJobTitle");
+		features2.put("kind", "jobtitle");
+		outputAS.add(postAS.firstNode(),postAS.lastNode(), "PersonChar", features2);
+		outputAS.removeAll(postAS);
+	}
+}
+
+Rule: PersonDOB
+({CoreName}):person
+(
+	({Token.string == ","})?
+	({Token.string == "("})?
+	{Token.string == "DOB"}
+)
+-->
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",PersonDOB");
+	} else {
+		features.put("rule", "PersonDOB");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[0] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[0].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[0] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule: PersonPOB
+({CoreName}):person
+(
+	({Token.string == ","})?
+	({Token.string == "("})?
+	{Token.string == "POB"}
+)
+-->
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "PersonPOB");
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",PersonPOB");
+	} else {
+		features.put("rule", "PersonPOB");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[0] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[0].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[0] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule: Citizen2
+({CoreName}):person
+(
+	({Token.string == "("}|{Token.string == ","})?
+	({Token.string == "is"}|{Token.string == "IS"})?
+	({Token.string == "a"}|{Token.string == "A"}|{Token.string == "an"}|{Token.string == "AN"})?
+	({Token.string == "naturalized"}|{Token.string == "Naturalized"}|{Token.string == "NATURALIZED"})?
+	({Lookup.majorType == "country_adj"}|{Lookup.minorType == "country"})
+	({Token.string == "native"}|{Token.string == "Native"}|{Token.string == "NATIVE"}|{Token.string == "citizen"}|{Token.string == "Citizen"}|{Token.string == "CITIZEN"}|{Token.string == "national"}|{Token.string == "National"}|{Token.string == "NATIONAL"}|{Token.string == "citizens"}|{Token.string == "CITIZENS"}|{Token.string == "nationals"}|{Token.string == "NATIONALS"})
+)
+-->
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",Citizen2");
+	} else {
+		features.put("rule", "Citizen2");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[0] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[0].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[0] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+  
+Rule: Citizen3
+({CoreName}):person
+(
+	({Token.string == ","})?
+	({Token.string == "a"}|{Token.string == "A"})?
+	({Token.string == "native"}|{Token.string == "Native"}|{Token.string == "NATIVE"}|{Token.string == "citizen"}|{Token.string == "Citizen"}|{Token.string == "CITIZEN"}|{Token.string == "national"}|{Token.string == "National"}|{Token.string == "NATIONAL"}|{Token.string == "citizens"}|{Token.string == "CITIZENS"}|{Token.string == "nationals"}|{Token.string == "NATIONALS"})
+	({Token.string == "of"}|{Token.string == "OF"})?
+	({Token.string == "the"}|{Token.string == "THE"})?
+	({Lookup.minorType == "country"})
+)
+-->
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",Citizen3");
+	} else {
+		features.put("rule", "Citizen3");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[0] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[0].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[0] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+
+Rule: OrgPostKey
+//Hezb-i-Islami group
+(
+	
+	({CoreName}):org
+	({Lookup.majorType == "org_key"}|{Lookup.majorType == "govern_key"}|{Lookup.majorType == "military_key"})[1,3]:post
+)
+-->
+{
+	String wgtStr;
+	int wgt = 0;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",OrgPostKey");
+	} else {
+		features.put("rule", "OrgPostKey");
+	}
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	personAS = (gate.AnnotationSet)bindings.get("org");
+	personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[1] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[1].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[1] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule: OrgPostCE
+(
+({CoreName}):org
+(
+	(	({Token.string == "'"})
+		({Token.string == "s"})?
+	)|
+	({Token.string == ","})|
+	({Token.string == "&"})|
+	({Token.string == "And"})
+)?
+(
+(COMPANYENDING)|
+({CoreName})
+):post
+):org2
+-->
+{
+	String wgtStr;
+	int wgt = 250;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	gate.AnnotationSet personAS2 = (gate.AnnotationSet)bindings.get("org");
+	personAnn = (gate.Annotation)personAS2.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",OrgPostCE");
+	} else {
+		features.put("rule", "OrgCE");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[1] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[1].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[1] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS2.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);
+		outputAS.removeAll(personAS2);
+	}
+}
+
+Rule:OrgPerson
+// Nokia's Vice-President
+
+({CoreName}):org
+(
+ ({Token.string == "'"}
+  ({Token.string == "s"}|{Token.string == "S"})?
+ )?
+ ({Lookup.majorType == "title"}|{Lookup.majorType == "jobtitle"}):post
+)
+--> 
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	gate.AnnotationSet personAS2 = (gate.AnnotationSet)bindings.get("org");
+	personAnn = (gate.Annotation)personAS2.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",OrgCE");
+	} else {
+		features.put("rule", "OrgCE");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[1] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[1].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[1] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS2.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);
+		outputAS.removeAll(personAS2);
+	}
+}
+
+Rule: OrgPostJobTitle
+({Token.category == "DT"})
+({CoreName}):person
+({Token.string == ","})?
+({Token.category == "DT"})?
+({Token.category == "JJ"})[0,3]
+({JobTitle}):post
+-->
+{
+	String wgtStr;
+	int wgt = 42;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	personAS = (gate.AnnotationSet)bindings.get("person");
+	personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",OrgPostJobTitle");
+	} else {
+		features.put("rule", "OrgPostJobTitle");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[1] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[1].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[1] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule:	CoreofCountry
+
+({CoreName}):org
+(
+	({Token.string == "in"}|{Token.string == "IN"}|{Token.string == "of"}|{Token.string == "OF"}|{Token.string == "Of"})
+	({Token.category == DT})?
+	(
+		{Lookup.minorType == "region"}|
+		{Lookup.minorType == "country"}|
+		{Lookup.minorType == "province"}
+	)
+):org2
+-->
+{
+	String wgtStr;
+	int wgt = 150;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "CoreofCountry");
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("org");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",CoreofCountry");
+	} else {
+		features.put("rule", "CoreofCountry");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[1] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[1].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[1] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	gate.AnnotationSet personAS2 = (gate.AnnotationSet)bindings.get("org2");
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS2.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);
+		outputAS.removeAll(personAS2);
+	}
+}
+
+Rule: FacilityPostKey
+({CoreName}):facility
+(	({Token.string == "'"})
+	({Token.string == "s"})?
+)?
+({Lookup.majorType == "facility_key"}):post
+-->
+{
+	String wgtStr;
+	int wgt = 150;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	gate.AnnotationSet personAS2 = (gate.AnnotationSet)bindings.get("facility");
+	gate.Annotation personAnn2 = (gate.Annotation)personAS2.iterator().next();
+	if (personAnn2.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn2.getFeatures().get("rule").toString().trim() + ",FacilityPostKey");
+	} else {
+		features.put("rule", "FacilityPostKey");
+	}
+	if (personAnn2.getFeatures().get("wgts") != null) {
+		wgts = personAnn2.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[2] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[2].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[2] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS2.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);
+		outputAS.removeAll(personAS2);
+	}
+}
+
+Rule: LocationPostKey
+(
+	({CoreName}):person
+	(
+		({Lookup.majorType == "loc_postkey"}):post
+	)
+)
+-->
+{
+	String wgtStr;
+	int wgt = 0;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	personAS = (gate.AnnotationSet)bindings.get("person");
+	personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",LocationPostKey");
+	} else {
+		features.put("rule", "LocationPostKey");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[4] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[4].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[4] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule:LocPostGeneralKey
+// Zawiya, a key city
+(
+({CoreName}):loc
+)
+(
+({Token.string == ","})?
+({Token.string == "a"}|{Token.string == "A"}|{Token.string == "the"}|{Token.string == "THE"})?
+({Token.category =~ "[JJ|JJS|JJR|JJSS]"})[0,3]
+ ({Lookup.majorType == loc_general_key}):post
+)
+-->
+{
+	String wgtStr;
+	int wgt = 0;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	personAS = (gate.AnnotationSet)bindings.get("loc");
+	personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",LocPostGeneralKey");
+	} else {
+		features.put("rule", "LocPostGeneralKey");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[4] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[4].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[4] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule:LocPostGeneralKey2
+// Benghazi, Libya's second largest city
+({CoreName}
+):loc
+(
+({Token.string == ","})?
+({Lookup.minorType == "country"}|{Lookup.majorType == "province"})?
+({Token.string == "'"}{Token.string == "s"})?
+({Token.string == "s"}|{Token.string == "S"})?
+({Token.category =~ "[JJ|JJS|JJR|JJSS]"})[0,3]
+({Lookup.majorType == loc_general_key}):post
+)
+-->
+{
+	String wgtStr;
+	int wgt = 0;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	personAS = (gate.AnnotationSet)bindings.get("loc");
+	personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",LocPostGeneralKey2");
+	} else {
+		features.put("rule", "LocPostGeneralKey2");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[4] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[4].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[4] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule: LocProvince 
+({CoreName}):loc
+{Token.string == ","}
+({Lookup.minorType == "province_abbrev"}|{Lookup.minorType == "province"}):post
+-->
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	personAS = (gate.AnnotationSet)bindings.get("loc");
+	personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",LocPostGeneralKey2");
+	} else {
+		features.put("rule", "LocPostGeneralKey2");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[4] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[4].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[4] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule: LocCountry 
+
+({CoreName}):loc
+{Token.string == ","}
+({Lookup.minorType == "country"}):post
+-->
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	personAS = (gate.AnnotationSet)bindings.get("loc");
+	personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn.getFeatures().get("rule").toString().trim() + ",LocPostGeneralKey2");
+	} else {
+		features.put("rule", "LocPostGeneralKey2");
+	}
+	if (personAnn.getFeatures().get("wgts") != null) {
+		wgts = personAnn.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[4] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[4].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[4] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule: NamePlatePost
+
+({CoreName}):loc
+({Lookup.majorType == "autonameplate"}):post
+-->
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	gate.AnnotationSet personAS2 = (gate.AnnotationSet)bindings.get("loc");
+	gate.Annotation personAnn2 = (gate.Annotation)personAS2.iterator().next();
+	if (personAnn2.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn2.getFeatures().get("rule").toString().trim() + ",NamePlatePost");
+	} else {
+		features.put("rule", "NamePlatePost");
+	}
+	if (personAnn2.getFeatures().get("wgts") != null) {
+		wgts = personAnn2.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[5] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[5].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[5] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS2.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}
+
+Rule: PlatformPost
+
+({CoreName}):loc
+({Lookup.majorType == "platform"})+:post
+-->
+{
+	String wgtStr;
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("post");
+	gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+	if (personAnn.getFeatures().get("weight") != null) {
+		try {
+			wgt += Integer.parseInt(personAnn.getFeatures().get("weight").toString().trim());
+		} catch (NumberFormatException e) {
+			//wgt = 0;
+		}
+	}
+	gate.AnnotationSet personAS2 = (gate.AnnotationSet)bindings.get("loc");
+	gate.Annotation personAnn2 = (gate.Annotation)personAS2.iterator().next();
+	if (personAnn2.getFeatures().get("rule") != null) {
+		features.put("rule", personAnn2.getFeatures().get("rule").toString().trim() + ",NamePlatePost");
+	} else {
+		features.put("rule", "NamePlatePost");
+	}
+	if (personAnn2.getFeatures().get("wgts") != null) {
+		wgts = personAnn2.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0].trim();
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19].trim();
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		if (wgts[5] != null) {
+			try {
+				wgt += Integer.parseInt(wgts[5].trim());
+			} catch (NumberFormatException e) {
+				//wgt = 0;
+			}
+		}
+	}
+	wgts[5] = Integer.toString(wgt);
+	features.put("wgts", Arrays.asList(wgts));
+	if (wgt > 0) {
+		outputAS.add(personAS2.firstNode(), personAS.lastNode(), "CoreName", features);
+		outputAS.removeAll(personAS);	
+	}
+}

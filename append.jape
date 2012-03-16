@@ -1,0 +1,21 @@
+Phase:	Append
+Input: Title Person Token
+Options: control = appelt
+
+Rule: AppendPersonTitle
+({Title}):title
+({Person}):person
+-->
+{
+	gate.FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "AppendPersonTitle");
+	gate.AnnotationSet titleAS = (gate.AnnotationSet)bindings.get("title");
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	if (titleAS != null) {
+		if (personAS != null) {
+			outputAS.add(titleAS.firstNode(),personAS.lastNode(),"Person",features);
+			outputAS.removeAll(titleAS);
+			outputAS.removeAll(personAS);
+		}
+	}
+}

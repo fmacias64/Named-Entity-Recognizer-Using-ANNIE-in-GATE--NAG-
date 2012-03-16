@@ -1,0 +1,64 @@
+Phase:	First
+Input: Token Lookup Split SpaceToken CoreName
+Options: control = all debug = false
+/*
+0 = Person
+1 = Organization
+2 = Facility
+3 = Vessel
+4 = Location - natural and man-made features, including political entities such as municipalities.
+5 = Vehicle
+6 = Street
+*/
+
+
+Rule: JoinCores
+
+(
+	({CoreName}) :cor1
+	(
+		(
+			({Token.string == "'"}|{Token.string == "`"}|{Token.string == "’"})
+			{Token.kind == "word"}
+		)[1,5]
+	
+	) :cor2
+)
+-->
+
+{
+	gate.FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "JoinCores");
+	gate.AnnotationSet titleAS = (gate.AnnotationSet)bindings.get("cor1");
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("cor2");
+	if (titleAS != null) {
+		if (personAS != null) {
+			outputAS.add(titleAS.firstNode(),personAS.lastNode(),"CoreName",features);
+			outputAS.removeAll(titleAS);
+//			outputAS.removeAll(personAS);
+		}
+	}
+}
+
+Rule: JoinPossessiveCores
+
+(
+	({CoreName}) :cor1
+	({Token.string == "'"}|{Token.string == "'s"})
+	{SpaceToken}
+	({CoreName}) :cor2
+)
+-->
+	{
+		gate.FeatureMap features = Factory.newFeatureMap();
+		features.put("rule", "JoinPossessiveCores");
+		gate.AnnotationSet titleAS = (gate.AnnotationSet)bindings.get("cor1");
+		gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("cor2");
+		if (titleAS != null) {
+			if (personAS != null) {
+				outputAS.add(titleAS.firstNode(),personAS.lastNode(),"CoreName",features);
+				outputAS.removeAll(titleAS);
+				outputAS.removeAll(personAS);
+			}
+		}
+}

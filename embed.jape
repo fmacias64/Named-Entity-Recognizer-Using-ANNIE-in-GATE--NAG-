@@ -1,0 +1,796 @@
+Phase:	Embed
+Input: Token Lookup Title TempDate Split JobTitle CoreName
+Options: control = all
+
+Rule:	PersonTitleEmbed
+(
+{Title}
+):person
+-->  
+{
+	int wgt = 150;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	//gate.Annotation personAN = (gate.Annotation)personAS.iterator().next();
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", personAS.firstNode().getOffset(), personAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",PersonTitleEmbed");
+		} else {
+			features.put("rule", "PersonTitleEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[0] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[0].trim());
+				} catch (NumberFormatException e) {
+					//wgt = 0;
+				}
+			}	
+		}
+		wgts[0] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if ((personAS.firstNode().getOffset() <= XtagAS.firstNode().getOffset()) && (personAS.lastNode().getOffset() < XtagAS.lastNode().getOffset())) {
+				outputAS.add(personAS.lastNode(),XtagAS.lastNode(),"CoreName",features);
+				outputAS.removeAll(XtagAS);
+				outputAS.removeAll(personAS);
+			} else if ((personAS.firstNode().getOffset() >= XtagAS.firstNode().getOffset()) && (personAS.lastNode().getOffset() < XtagAS.lastNode().getOffset())) {
+				outputAS.add(personAS.lastNode(),XtagAS.lastNode(),"CoreName",features);
+				outputAS.removeAll(XtagAS);
+				outputAS.removeAll(personAS);
+			}
+		}
+	}
+}
+
+Rule:	PersonJobTitleEmbed
+(
+{JobTitle}
+):person
+-->  
+{
+	int wgt = 150;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	//gate.Annotation personAN = (gate.Annotation)personAS.iterator().next();
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", personAS.firstNode().getOffset(), personAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",PersonJobTitleEmbed");
+		} else {
+			features.put("rule", "PersonJobTitleEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[0] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[0].trim());
+				} catch (NumberFormatException e) {
+					//wgt = 0;
+				}
+			}
+		}
+		wgts[0] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if ((personAS.firstNode().getOffset() <= XtagAS.firstNode().getOffset()) && (personAS.lastNode().getOffset() < XtagAS.lastNode().getOffset())) {
+				outputAS.add(personAS.lastNode(),XtagAS.lastNode(),"CoreName",features);
+				outputAS.removeAll(XtagAS);
+				outputAS.removeAll(personAS);
+			} else if ((personAS.firstNode().getOffset() >= XtagAS.firstNode().getOffset()) && (personAS.lastNode().getOffset() < XtagAS.lastNode().getOffset())) {
+				outputAS.add(personAS.lastNode(),XtagAS.lastNode(),"CoreName",features);
+				outputAS.removeAll(XtagAS);
+				outputAS.removeAll(personAS);
+			}
+
+		}
+	}
+}
+
+Rule:	OrgKeyEmbed
+(
+{Lookup.majorType == "org_key"}|{Lookup.majorType == "govern_key"}|{Lookup.majorType == "military_key"}
+)[1,3]:org
+-->  
+{
+	int wgt = 150;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet orgAS = (gate.AnnotationSet)bindings.get("org");
+	//Start debug code
+	//gate.Annotation orgAN;
+	//gate.Annotation XtagAN;
+	//int start_offset= 0;
+	//int end_offset = 0;
+	//String orgStr = "";
+	//orgAN = (gate.Annotation)orgAS.iterator().next();
+	//start_offset = orgAN.getStartNode().getOffset().intValue();
+	//end_offset = orgAN.getEndNode().getOffset().intValue();
+	//orgStr = doc.getContent().toString().substring(start_offset, end_offset);
+	//System.out.println("Org " + orgStr);
+	//End debug code
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", orgAS.firstNode().getOffset(), orgAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		//Start debug code
+		//XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		//start_offset = XtagAN.getStartNode().getOffset().intValue();
+		//end_offset = XtagAN.getEndNode().getOffset().intValue();
+		//orgStr = doc.getContent().toString().substring(start_offset, end_offset);
+		//System.out.println("XTagAS " + orgStr);
+		//End debug code
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",OrgKeyEmbed");
+		} else {
+			features.put("rule", "OrgKeyEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[1] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[1].trim());
+				} catch (NumberFormatException e) {
+					//wgt = 0;
+				}
+			}
+		}
+		wgts[1] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if (orgAS.firstNode().getOffset() < XtagAS.firstNode().getOffset()) {
+				if (orgAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(orgAS.firstNode(),orgAS.lastNode(),"CoreName",features);
+					//System.out.println("1");
+				} else {
+					outputAS.add(orgAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("2");
+				}
+			} else if (orgAS.firstNode().getOffset() > XtagAS.firstNode().getOffset()) {
+				if (orgAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),orgAS.lastNode(),"CoreName",features);
+					//System.out.println("3");
+				} else if (orgAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("4");
+				}
+			} else {
+				if (orgAS.lastNode().getOffset() > XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),orgAS.lastNode(),"CoreName",features);
+					//System.out.println("5");
+				} else if (orgAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("6");
+				} else {
+					features.put("type", "orgstub"); //this is used in clean to rid these if they don't become something bigger.
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("7");
+				}			
+			}
+			outputAS.removeAll(XtagAS);
+			outputAS.removeAll(orgAS);
+		}
+	}
+}
+
+Rule:	OrgEndEmbed
+(
+{Lookup.majorType == "company_ending"}
+):org
+-->  
+{
+	int wgt = 150;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet orgAS = (gate.AnnotationSet)bindings.get("org");	
+	//Start debug code
+	//gate.Annotation orgAN;
+	//gate.Annotation XtagAN;
+	//int start_offset= 0;
+	//int end_offset = 0;
+	//String orgStr = "";
+	//orgAN = (gate.Annotation)orgAS.iterator().next();
+	//start_offset = orgAN.getStartNode().getOffset().intValue();
+	//end_offset = orgAN.getEndNode().getOffset().intValue();
+	//orgStr = doc.getContent().toString().substring(start_offset, end_offset);
+	//System.out.println("Org " + orgStr);
+	//End debug code
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", orgAS.firstNode().getOffset(), orgAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		//Start debug code
+		//XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		//start_offset = XtagAN.getStartNode().getOffset().intValue();
+		//end_offset = XtagAN.getEndNode().getOffset().intValue();
+		//orgStr = doc.getContent().toString().substring(start_offset, end_offset);
+		//System.out.println("XTagAS " + orgStr);
+		//End debug code
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",OrgEndEmbed");
+		} else {
+			features.put("rule", "OrgEndEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[1] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[1].trim());
+				} catch (NumberFormatException e) {
+					//wgt = 0;
+				}
+			}
+		}
+		wgts[1] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if (orgAS.firstNode().getOffset() < XtagAS.firstNode().getOffset()) {
+				if (orgAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(orgAS.firstNode(),orgAS.lastNode(),"CoreName",features);
+					//System.out.println("1");
+				} else {
+					outputAS.add(orgAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("2");
+				}
+			} else if (orgAS.firstNode().getOffset() > XtagAS.firstNode().getOffset()) {
+				if (orgAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),orgAS.lastNode(),"CoreName",features);
+					//System.out.println("3");
+				} else if (orgAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("4");
+				}
+			} else {
+				if (orgAS.lastNode().getOffset() > XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),orgAS.lastNode(),"CoreName",features);
+					//System.out.println("5");
+				} else if (orgAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("6");
+				} else {
+					features.put("type", "orgstub"); //this is used in clean to rid these if they don't become something bigger.
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("7");
+				}			
+			}
+			outputAS.removeAll(XtagAS);
+			outputAS.removeAll(orgAS);
+		}
+	}
+}
+
+
+Rule: FacilityEmbed
+(
+	{Lookup.majorType == "facility_key"}
+):facility
+-->
+{
+	int wgt = 0;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet facilityAS = (gate.AnnotationSet)bindings.get("facility");
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", facilityAS.firstNode().getOffset(), facilityAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",FacilityEmbed");
+		} else {
+			features.put("rule", "FacilityEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[2] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[2].trim());
+				} catch (NumberFormatException e) {
+				}
+			} 
+		}
+		if (facilityAS.firstNode().getOffset() < XtagAS.firstNode().getOffset()) {
+			if (facilityAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+				wgts[2] = Integer.toString(wgt + 50);
+				features.put("wgts", Arrays.asList(wgts));
+				outputAS.add(facilityAS.firstNode(),facilityAS.lastNode(),"CoreName",features);
+			} else {
+				wgts[2] = Integer.toString(wgt + 150);
+				features.put("wgts", Arrays.asList(wgts));
+				outputAS.add(facilityAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+			}
+		} else if (facilityAS.firstNode().getOffset() > XtagAS.firstNode().getOffset()) {
+			if (facilityAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+				wgts[2] = Integer.toString(wgt + 150);
+				features.put("wgts", Arrays.asList(wgts));
+				outputAS.add(XtagAS.firstNode(),facilityAS.lastNode(),"CoreName",features);
+			} else if (facilityAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+				wgts[2] = Integer.toString(wgt + 50);
+				features.put("wgts", Arrays.asList(wgts));
+				outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+			}
+		} else {
+			if (facilityAS.lastNode().getOffset() > XtagAS.lastNode().getOffset()) {
+				wgts[2] = Integer.toString(wgt + 150);
+				features.put("wgts", Arrays.asList(wgts));
+				outputAS.add(XtagAS.firstNode(),facilityAS.lastNode(),"Facility",features);
+			} else if (facilityAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+				wgts[2] = Integer.toString(wgt + 150);
+				features.put("wgts", Arrays.asList(wgts));
+				outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+			} else {
+				features.put("type", "facstub"); //this is used in clean to rid these if they don't become something bigger.
+				wgts[2] = Integer.toString(wgt + 150);
+				features.put("wgts", Arrays.asList(wgts));
+				outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+			}			
+		}
+		outputAS.removeAll(XtagAS);
+		outputAS.removeAll(facilityAS);
+	}
+}
+
+Rule: VesselEmbed
+(
+{Lookup.majorType == "vessel_prefix"}
+):person
+-->  
+{
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	//gate.Annotation personAN = (gate.Annotation)personAS.iterator().next();
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", personAS.firstNode().getOffset(), personAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",VesselEmbed");
+		} else {
+			features.put("rule", "VesselEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[3] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[3].trim());
+				} catch (NumberFormatException e) {
+					//wgt = 0;
+				}
+			}
+		}
+		wgts[3] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if (personAS.firstNode().getOffset() < XtagAS.firstNode().getOffset()) {
+				if ((personAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+					outputAS.add(personAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+				} else {
+					outputAS.add(personAS.firstNode(),personAS.lastNode(),"CoreName",features);
+				}
+			} else if (personAS.firstNode().getOffset() > XtagAS.firstNode().getOffset()) {
+				if (personAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+				} else {
+					outputAS.add(XtagAS.firstNode(),personAS.lastNode(),"CoreName",features);
+				}
+			} else {
+				if (personAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+				} else {
+					features.put("type", "vesstub"); //this is used in clean to rid these if they don't become something bigger.
+					outputAS.add(XtagAS.firstNode(),personAS.lastNode(),"CoreName",features);
+				}
+			}
+			outputAS.removeAll(XtagAS);
+			outputAS.removeAll(personAS);
+		}
+	}
+}
+
+Rule:	LocationEmbed
+(
+ {Lookup.majorType == location, Lookup.minorType != "province_abbrev"}
+):loc
+ --> 	
+{
+	int wgt = 100;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet facilityAS = (gate.AnnotationSet)bindings.get("loc");
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", facilityAS.firstNode().getOffset(), facilityAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",LocationEmbed");
+		} else {
+			features.put("rule", "LocationEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[4] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[4].trim());
+				} catch (NumberFormatException e) {
+				}
+			} 
+		}
+		wgts[4] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if (facilityAS.firstNode().getOffset() < XtagAS.firstNode().getOffset()) {
+				if (facilityAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(facilityAS.firstNode(),facilityAS.lastNode(),"CoreName",features);
+					//System.out.println("1");
+				} else {
+					outputAS.add(facilityAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("2");
+				}
+			} else if (facilityAS.firstNode().getOffset() > XtagAS.firstNode().getOffset()) {
+				if (facilityAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),facilityAS.lastNode(),"CoreName",features);
+					//System.out.println("3");
+				} else if (facilityAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("4");
+				}
+			} else {
+				if (facilityAS.lastNode().getOffset() > XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),facilityAS.lastNode(),"Facility",features);
+					//System.out.println("5");
+				} else if (facilityAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("6");
+				} else {
+					//features.put("type", "facstub"); //this is used in clean to rid these if they don't become something bigger.
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("7");
+				}			
+			}
+			outputAS.removeAll(XtagAS);
+			outputAS.removeAll(facilityAS);
+		}
+	}
+}
+
+Rule:	LocGenKeyEmbed
+(
+ {Lookup.majorType == "loc_general_key"}
+):loc
+ --> 	
+{
+	int wgt = 100;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet facilityAS = (gate.AnnotationSet)bindings.get("loc");
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", facilityAS.firstNode().getOffset(), facilityAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",LocGenKeyEmbed");
+		} else {
+			features.put("rule", "LocGenKeyEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[4] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[4].trim());
+				} catch (NumberFormatException e) {
+				}
+			} 
+		}
+		wgts[4] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if (facilityAS.firstNode().getOffset() < XtagAS.firstNode().getOffset()) {
+				if (facilityAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(facilityAS.firstNode(),facilityAS.lastNode(),"CoreName",features);
+					//System.out.println("1");
+				} else {
+					outputAS.add(facilityAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("2");
+				}
+			} else if (facilityAS.firstNode().getOffset() > XtagAS.firstNode().getOffset()) {
+				if (facilityAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),facilityAS.lastNode(),"CoreName",features);
+					//System.out.println("3");
+				} else if (facilityAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("4");
+				}
+			} else {
+				if (facilityAS.lastNode().getOffset() > XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),facilityAS.lastNode(),"Facility",features);
+					//System.out.println("5");
+				} else if (facilityAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("6");
+				} else {
+					//features.put("type", "facstub"); //this is used in clean to rid these if they don't become something bigger.
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("7");
+				}			
+			}
+			outputAS.removeAll(XtagAS);
+			outputAS.removeAll(facilityAS);
+		}
+	}
+}
+
+Rule:	StreetEmbed
+(
+ {Lookup.minorType == "street"}
+):loc
+ --> 	
+{
+	int wgt = 100;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet facilityAS = (gate.AnnotationSet)bindings.get("loc");
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", facilityAS.firstNode().getOffset(), facilityAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",LocationEmbed");
+		} else {
+			features.put("rule", "LocationEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[6] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[6].trim());
+				} catch (NumberFormatException e) {
+				}
+			} 
+		}
+		wgts[6] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if (facilityAS.firstNode().getOffset() < XtagAS.firstNode().getOffset()) {
+				if (facilityAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(facilityAS.firstNode(),facilityAS.lastNode(),"CoreName",features);
+					//System.out.println("1");
+				} else {
+					outputAS.add(facilityAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("2");
+				}
+			} else if (facilityAS.firstNode().getOffset() > XtagAS.firstNode().getOffset()) {
+				if (facilityAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),facilityAS.lastNode(),"CoreName",features);
+					//System.out.println("3");
+				} else if (facilityAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("4");
+				}
+			} else {
+				if (facilityAS.lastNode().getOffset() > XtagAS.lastNode().getOffset()) {
+					outputAS.add(XtagAS.firstNode(),facilityAS.lastNode(),"Facility",features);
+					//System.out.println("5");
+				} else if (facilityAS.lastNode().getOffset() < XtagAS.lastNode().getOffset()){
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("6");
+				} else {
+					//features.put("type", "streetstub"); //this is used in clean to rid these if they don't become something bigger.
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+					//System.out.println("7");
+				}			
+			}
+			outputAS.removeAll(XtagAS);
+			outputAS.removeAll(facilityAS);
+		}
+	}
+}
+
+Rule: VehicleMakerEmbed
+(
+{Lookup.majorType == "automaker"}|{Lookup.majorType == "planemaker"}
+):person
+-->  
+{
+	int wgt = 50;
+	int wgt2 = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	//gate.Annotation personAN = (gate.Annotation)personAS.iterator().next();
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", personAS.firstNode().getOffset(), personAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",VehicleMakerEmbed");
+		} else {
+			features.put("rule", "VehicleMakerEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[5] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[5].trim());
+				} catch (NumberFormatException e) {
+					//wgt = 0;
+				}
+			}
+			if (wgts[1] != null) {
+				try {
+					wgt2 += Integer.parseInt(wgts[1].trim());
+				} catch (NumberFormatException e) {
+					//wgt = 0;
+				}
+			}
+		}
+		wgts[5] = Integer.toString(wgt);
+		wgts[1] = Integer.toString(wgt2);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if (personAS.firstNode().getOffset() <= XtagAS.firstNode().getOffset()) {
+				if ((personAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+					outputAS.add(personAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+				} else {
+					outputAS.add(personAS.firstNode(),personAS.lastNode(),"CoreName",features);
+				}
+			} else {
+				if ((personAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+				} else {
+					outputAS.add(XtagAS.firstNode(),personAS.lastNode(),"CoreName",features);
+				}
+			}
+			outputAS.removeAll(XtagAS);
+			outputAS.removeAll(personAS);
+		}
+	}
+}
+
+Rule: VehicleNameplateEmbed
+(
+{Lookup.majorType == "autonameplate"}|{Lookup.majorType == "platform"}
+):person
+-->  
+{
+	int wgt = 50;
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("person");
+	//gate.Annotation personAN = (gate.Annotation)personAS.iterator().next();
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", personAS.firstNode().getOffset(), personAS.lastNode().getOffset());
+	if (XtagAS != null && XtagAS.firstNode() != null && XtagAS.lastNode() != null) {
+		gate.Annotation XtagAN = (gate.Annotation)XtagAS.iterator().next();
+		if (XtagAN.getFeatures().get("rule") != null) {
+			features.put("rule", XtagAN.getFeatures().get("rule").toString().trim() + ",VehicleNameplateEmbed");
+		} else {
+			features.put("rule", "VehicleNameplateEmbed");
+		}
+		if (XtagAN.getFeatures().get("wgts") != null) {
+			wgts = XtagAN.getFeatures().get("wgts").toString().split(",");
+			if (wgts[0] != null) {
+				wgtTmp = wgts[0].trim();
+				wgts[0] = wgtTmp.substring(1);
+			}
+			if (wgts[19] != null) {
+				wgtTmp = wgts[19].trim();
+				wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+			}
+			if (wgts[5] != null) {
+				try {
+					wgt += Integer.parseInt(wgts[5].trim());
+				} catch (NumberFormatException e) {
+					//wgt = 0;
+				}
+			}
+		}
+		wgts[5] = Integer.toString(wgt);
+		features.put("wgts", Arrays.asList(wgts));
+		if (wgt > 0) {
+			if (personAS.firstNode().getOffset() <= XtagAS.firstNode().getOffset()) {
+				if ((personAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+					outputAS.add(personAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+				} else {
+					outputAS.add(personAS.firstNode(),personAS.lastNode(),"CoreName",features);
+				}
+			} else {
+				if ((personAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+					outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"CoreName",features);
+				} else {
+					outputAS.add(XtagAS.firstNode(),personAS.lastNode(),"CoreName",features);
+				}
+			}
+			outputAS.removeAll(XtagAS);
+			outputAS.removeAll(personAS);
+		}
+	}
+}

@@ -1,0 +1,48 @@
+Phase:	Titles
+Input: Lookup Token
+Options: control = appelt
+
+Rule: Jobtitle
+ (
+ ({Lookup.majorType == jobtitle}):jobtitle1
+ ({Lookup.majorType == jobtitle})?:jobtitle2
+ ({Lookup.majorType == jobtitle})?:jobtitle3
+ ):jobtitle
+-->
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("jobtitle");
+gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+features.put("rule", "JobTitle");
+outputAS.add(personAS.firstNode(), personAS.lastNode(), "JobTitle", features);
+outputAS.removeAll(personAS);
+for (int i=1;i<=3;i++) {
+	personAS = (gate.AnnotationSet)bindings.get("jobtitle" + Integer.toString(i).trim());
+	if (personAS != null) {
+		outputAS.removeAll(personAS);
+	}
+	}
+}
+ 
+ Rule: Title
+ // Dr
+ (
+ ({Lookup.majorType == title}):title1
+ ({Lookup.majorType == title})?:title2
+ ({Lookup.majorType == title})?:title3
+ ):title
+ -->
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+gate.AnnotationSet personAS = (gate.AnnotationSet)bindings.get("title");
+gate.Annotation personAnn = (gate.Annotation)personAS.iterator().next();
+features.put("rule", "Title");
+outputAS.add(personAS.firstNode(), personAS.lastNode(), "Title", features);
+outputAS.removeAll(personAS);
+for (int i=1;i<=3;i++) {
+	personAS = (gate.AnnotationSet)bindings.get("title" + Integer.toString(i).trim());
+	if (personAS != null) {
+		outputAS.removeAll(personAS);
+	}
+	}
+}

@@ -1,0 +1,17 @@
+Phase:	CleanDate
+Input: Date CoreName Token
+Options: control = appelt
+
+Rule: ReduceDate
+(
+{Date}
+):nuke
+-->
+{
+	gate.AnnotationSet nukeAS = (gate.AnnotationSet)bindings.get("nuke");
+	gate.AnnotationSet XtagAS = inputAS.get("CoreName", nukeAS.firstNode().getOffset(), nukeAS.lastNode().getOffset());
+
+	if (XtagAS != null) {
+		outputAS.removeAll(XtagAS);
+	}
+}

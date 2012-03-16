@@ -1,0 +1,136 @@
+Imports: { 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+}
+
+Phase:	DateTime
+Input: Token Lookup SpaceToken Split
+Options: control = all
+
+Rule: ddmmyyyy
+({SpaceToken}|{Token.kind == punctuation}|{Split})
+(
+({Lookup.majorType == "day_of_month"}):date
+({Token.string == "-"}|{Token.string == "/"})?
+({Lookup.majorType == "month_num"}):month
+({Token.string == "-"}|{Token.string == "/"})?
+({Lookup.majorType == "year"}):year
+):datef
+({SpaceToken}|{Token.kind == punctuation})
+-->
+:datef.Date = {rule = "ddmmyyyy"},
+  {
+  	 if (doc.getFeatures().get("docDate") == null) {
+  	 	int start_offset=0;
+ 		int end_offset = 0;
+  	 	gate.AnnotationSet mon = (gate.AnnotationSet) bindings.get("month");
+ 		gate.Annotation  Amon = (gate.Annotation)mon.iterator().next();
+ 		start_offset = Amon.getStartNode().getOffset().intValue();
+ 		end_offset = Amon.getEndNode().getOffset().intValue();
+ 		String monthStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		gate.AnnotationSet dat = (gate.AnnotationSet) bindings.get("date");
+ 		gate.Annotation  Adat = (gate.Annotation)dat.iterator().next();
+ 		start_offset = Adat.getStartNode().getOffset().intValue();
+ 		end_offset = Adat.getEndNode().getOffset().intValue();
+ 		String dayStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		gate.AnnotationSet yea = (gate.AnnotationSet) bindings.get("year");
+ 		gate.Annotation  Ayea = (gate.Annotation)yea.iterator().next();
+ 		start_offset = Ayea.getStartNode().getOffset().intValue();
+ 		end_offset = Ayea.getEndNode().getOffset().intValue();
+ 		String yearStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		//SimpleDateFormat df2 = new SimpleDateFormat("MM dd yyyy");
+ 		try {
+ 			SimpleDateFormat df = new SimpleDateFormat("MM dd yyyy");
+ 			Date dateX = df.parse(monthStr + " " + dayStr + " " + yearStr);
+ 			doc.getFeatures().put("docDate",df.format(dateX));
+ 			//System.out.println(df.format(dateX));
+  		} catch (ParseException e) {
+ 			
+ 		}
+  	 }
+}
+
+Rule: mmddyyyy
+({SpaceToken}|{Token.kind == punctuation}|{Split})
+(
+({Lookup.majorType == "month_num"}):month
+({Token.string == "-"}|{Token.string == "/"})?
+({Lookup.majorType == "day_of_month"}):date
+({Token.string == "-"}|{Token.string == "/"})?
+({Lookup.majorType == "year"}):year
+):datef
+({SpaceToken}|{Token.kind == punctuation})
+-->
+:datef.Date = {rule = "mmddyyyy"},
+  {
+  	 if (doc.getFeatures().get("docDate") == null) {
+  	 	int start_offset=0;
+ 		int end_offset = 0;
+  	 	gate.AnnotationSet mon = (gate.AnnotationSet) bindings.get("month");
+ 		gate.Annotation  Amon = (gate.Annotation)mon.iterator().next();
+ 		start_offset = Amon.getStartNode().getOffset().intValue();
+ 		end_offset = Amon.getEndNode().getOffset().intValue();
+ 		String monthStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		gate.AnnotationSet dat = (gate.AnnotationSet) bindings.get("date");
+ 		gate.Annotation  Adat = (gate.Annotation)dat.iterator().next();
+ 		start_offset = Adat.getStartNode().getOffset().intValue();
+ 		end_offset = Adat.getEndNode().getOffset().intValue();
+ 		String dayStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		gate.AnnotationSet yea = (gate.AnnotationSet) bindings.get("year");
+ 		gate.Annotation  Ayea = (gate.Annotation)yea.iterator().next();
+ 		start_offset = Ayea.getStartNode().getOffset().intValue();
+ 		end_offset = Ayea.getEndNode().getOffset().intValue();
+ 		String yearStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		//SimpleDateFormat df2 = new SimpleDateFormat("MM dd yyyy");
+ 		try {
+ 			SimpleDateFormat df = new SimpleDateFormat("MM dd yyyy");
+ 			Date dateX = df.parse(monthStr + " " + dayStr + " " + yearStr);
+ 			doc.getFeatures().put("docDate",df.format(dateX));
+ 			//System.out.println(df.format(dateX));
+  		} catch (ParseException e) {
+ 			
+ 		}
+  	 }
+}
+
+Rule: yyyymmdd
+({SpaceToken}|{Token.kind == punctuation}|{Split})
+(
+({Lookup.majorType == "year"}):year
+({Lookup.majorType == "month_num"}):month
+({Lookup.majorType == "day_of_month"}):date
+):datef
+({SpaceToken}|{Token.kind == punctuation})
+-->
+:datef.Date = {rule = "yyyymmdd"},
+  {
+  	 if (doc.getFeatures().get("docDate") == null) {
+  	 	int start_offset=0;
+ 		int end_offset = 0;
+  	 	gate.AnnotationSet mon = (gate.AnnotationSet) bindings.get("month");
+ 		gate.Annotation  Amon = (gate.Annotation)mon.iterator().next();
+ 		start_offset = Amon.getStartNode().getOffset().intValue();
+ 		end_offset = Amon.getEndNode().getOffset().intValue();
+ 		String monthStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		gate.AnnotationSet dat = (gate.AnnotationSet) bindings.get("date");
+ 		gate.Annotation  Adat = (gate.Annotation)dat.iterator().next();
+ 		start_offset = Adat.getStartNode().getOffset().intValue();
+ 		end_offset = Adat.getEndNode().getOffset().intValue();
+ 		String dayStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		gate.AnnotationSet yea = (gate.AnnotationSet) bindings.get("year");
+ 		gate.Annotation  Ayea = (gate.Annotation)yea.iterator().next();
+ 		start_offset = Ayea.getStartNode().getOffset().intValue();
+ 		end_offset = Ayea.getEndNode().getOffset().intValue();
+ 		String yearStr = doc.getContent().toString().substring(start_offset, end_offset);
+ 		//SimpleDateFormat df2 = new SimpleDateFormat("MM dd yyyy");
+ 		try {
+ 			SimpleDateFormat df = new SimpleDateFormat("MM dd yyyy");
+ 			Date dateX = df.parse(monthStr + " " + dayStr + " " + yearStr);
+ 			doc.getFeatures().put("docDate",df.format(dateX));
+ 			//System.out.println(df.format(dateX));
+  		} catch (ParseException e) {
+ 			
+ 		}
+  	 }
+}

@@ -1,0 +1,100 @@
+Phase:	Convert
+Input: Token Lookup Title TempDate Split JobTitle CoreName
+Options: control = brill
+
+Rule:	ConvertCoreName
+(
+{CoreName}
+):core
+-->  
+{
+	int hwm = 0; //high water mark
+	String[] wgts = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+	int wgt = 0;
+	String wgtTmp;
+	gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet coreAS = (gate.AnnotationSet)bindings.get("core");
+	gate.Annotation coreAN = (gate.Annotation)coreAS.iterator().next();
+	if (coreAN.getFeatures().get("rule") != null) {
+		features.put("rule", coreAN.getFeatures().get("rule").toString().trim() + ",ConvertCoreName");
+	} else {
+		features.put("rule", "ConvertCoreName");
+	}
+	if (coreAN.getFeatures().get("type") != null) {
+		features.put("type", coreAN.getFeatures().get("type").toString().trim());
+	}
+	if (coreAN.getFeatures().get("wgts") != null) {
+		wgts = coreAN.getFeatures().get("wgts").toString().split(",");
+		if (wgts[0] != null) {
+			wgtTmp = wgts[0];
+			wgts[0] = wgtTmp.substring(1);
+		}
+		if (wgts[19] != null) {
+			wgtTmp = wgts[19];
+			wgts[19] = wgtTmp.substring(0,wgtTmp.length()-1);
+		}
+		for (int i=0;i<20;i++) {
+			try {
+				wgt = Integer.parseInt(wgts[i].trim());
+				if (wgt > hwm) {
+					hwm = wgt;
+				}
+			} catch (NumberFormatException e) {
+			}
+		}
+	}
+	features.put("wgts", Arrays.asList(wgts));
+	if (hwm > 0) {
+		try {
+			wgt = Integer.parseInt(wgts[0].trim());
+			if (wgt == hwm) {
+				outputAS.add(coreAS.firstNode(),coreAS.lastNode(),"Person",features);
+			}
+		} catch (NumberFormatException e) {
+		}
+		try {
+			wgt = Integer.parseInt(wgts[1].trim());
+			if (wgt == hwm) {
+				outputAS.add(coreAS.firstNode(),coreAS.lastNode(),"Organization",features);
+			}
+		} catch (NumberFormatException e) {
+		}
+		try {
+			wgt = Integer.parseInt(wgts[2].trim());
+			if (wgt == hwm) {
+				outputAS.add(coreAS.firstNode(),coreAS.lastNode(),"Facility",features);
+			}
+		} catch (NumberFormatException e) {
+		}
+		try {
+			wgt = Integer.parseInt(wgts[3].trim());
+			if (wgt == hwm) {
+				outputAS.add(coreAS.firstNode(),coreAS.lastNode(),"Vessel",features);
+			}
+		} catch (NumberFormatException e) {
+		}
+		try {
+			wgt = Integer.parseInt(wgts[4].trim());
+			if (wgt == hwm) {
+				outputAS.add(coreAS.firstNode(),coreAS.lastNode(),"Location",features);
+			}
+		} catch (NumberFormatException e) {
+		}
+		try {
+			wgt = Integer.parseInt(wgts[5].trim());
+			if (wgt == hwm) {
+				outputAS.add(coreAS.firstNode(),coreAS.lastNode(),"Vehicle",features);
+			}
+		} catch (NumberFormatException e) {
+		}
+		try {
+			wgt = Integer.parseInt(wgts[6].trim());
+			if (wgt == hwm) {
+				outputAS.add(coreAS.firstNode(),coreAS.lastNode(),"Street",features);
+			}
+		} catch (NumberFormatException e) {
+		}
+		outputAS.removeAll(coreAS);
+	}
+	//Note: if hwm = 0, then we leave the incoming CoreName annotation intact.
+}

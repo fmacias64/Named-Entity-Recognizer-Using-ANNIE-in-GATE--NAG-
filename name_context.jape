@@ -1,0 +1,108 @@
+Phase:	NameContext2
+Input:  Token Person Split Lookup CoreName
+Options: control = appelt
+
+
+Rule: akaPerson
+(
+	({Person})
+	({Token.string == ","})?
+	({Token.string == "aka"}|{Token.string == "AKA"})
+	({CoreName, Token.string != "AKA"})+:person
+)
+-->
+{
+//removes old "CoreName" annotation and adds a "Person" one
+gate.AnnotationSet person = (gate.AnnotationSet) bindings.get("person");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule", "akaPerson");
+outputAS.add(person.firstNode(), person.lastNode(), "Person",features);
+outputAS.removeAll(person);
+}
+
+Rule: akaPerson2
+(
+	({Person})
+	({Token.string == ","})?
+	({Token.string == "also"}|{Token.string == "ALSO"})
+	({Token.string == "known"}|{Token.string == "KNOWN"})
+	({Token.string == "as"}|{Token.string == "AS"})
+	({CoreName})+:person
+)
+-->
+{
+//removes old "CoreName" annotation and adds a "Person" one
+gate.AnnotationSet person = (gate.AnnotationSet) bindings.get("person");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule", "akaPerson2");
+outputAS.add(person.firstNode(), person.lastNode(), "Person",features);
+outputAS.removeAll(person);
+}
+
+Rule: akaPerson3
+(
+	({CoreName})+:person
+	({Token.string == ","})?
+	({Token.string == "aka"}|{Token.string == "AKA"})
+	({Person})
+)
+-->
+{
+//removes old "CoreName" annotation and adds a "Person" one
+gate.AnnotationSet person = (gate.AnnotationSet) bindings.get("person");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule", "akaPerson");
+outputAS.add(person.firstNode(), person.lastNode(), "Person",features);
+outputAS.removeAll(person);
+}
+
+Rule: akaPerson4
+(
+	({CoreName})+:person
+	({Token.string == ","})?
+	({Token.string == "also"}|{Token.string == "ALSO"})
+	({Token.string == "known"}|{Token.string == "KNOWN"})
+	({Token.string == "as"}|{Token.string == "AS"})
+	({Person})
+)
+-->
+{
+//removes old "CoreName" annotation and adds a "Person" one
+gate.AnnotationSet person = (gate.AnnotationSet) bindings.get("person");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule", "akaPerson2");
+outputAS.add(person.firstNode(), person.lastNode(), "Person",features);
+outputAS.removeAll(person);
+}
+
+Rule: PersonandCoreName
+(
+	{Person}
+	({Token.string == "and"}|{Token.string == "AND"})
+	({CoreName})+ :person
+)
+-->
+{
+//removes old "CoreName" annotation and adds a "Person" one
+gate.AnnotationSet person = (gate.AnnotationSet) bindings.get("person");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule", "PersonandCoreName");
+outputAS.add(person.firstNode(), person.lastNode(), "Person",features);
+outputAS.removeAll(person);
+}
+
+Rule: CoreNameandPerson
+(
+	({CoreName})+ :person
+	({Token.string == "and"}|{Token.string == "AND"})
+	{Person}
+)
+-->
+{
+//removes old "CoreName" annotation and adds a "Person" one
+gate.AnnotationSet person = (gate.AnnotationSet) bindings.get("person");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule", "CoreNameandPerson");
+outputAS.add(person.firstNode(), person.lastNode(), "Person",features);
+outputAS.removeAll(person);
+}

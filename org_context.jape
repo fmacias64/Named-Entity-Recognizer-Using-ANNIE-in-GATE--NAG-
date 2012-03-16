@@ -1,0 +1,184 @@
+Phase:	Org_Context
+Input: Token Lookup Organization CoreName Location Person Vehicle Facility OrgStub
+Options: control = all
+
+Rule: OrgStubOrg
+(
+	({Organization.type == "orgstub"}):org1
+	({Token.category == "IN"}|{Token.category == "CC"})
+	({Organization}):org2
+):org3
+-->
+{
+gate.AnnotationSet org1 = (gate.AnnotationSet) bindings.get("org1");
+gate.AnnotationSet org2 = (gate.AnnotationSet) bindings.get("org2");
+gate.AnnotationSet org3 = (gate.AnnotationSet) bindings.get("org3");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule ", "OrgStubOrg");
+outputAS.add(org3.firstNode(), org3.lastNode(), "Organization",features);
+outputAS.removeAll(org1);
+outputAS.removeAll(org2);
+outputAS.removeAll(org3);
+}
+
+Rule: OrgKeyConjOrg
+(
+({Organization}):org1
+{Token.string == "&"}
+({Organization}):org2
+)
+({Token.category != "POS"})
+-->
+{
+gate.AnnotationSet org1 = (gate.AnnotationSet) bindings.get("org1");
+gate.AnnotationSet org2 = (gate.AnnotationSet) bindings.get("org2");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule ", "OrgKeyConjOrg");
+outputAS.add(org1.firstNode(), org2.lastNode(), "Organization",features);
+outputAS.removeAll(org1);
+outputAS.removeAll(org2);
+}
+
+Rule: OrgConjOrg1 
+({CoreName}):org
+(
+{Token.category == CC, !Token.string == "&"}
+{Organization}
+{Token.category != "POS"}
+)
+-->
+{
+gate.AnnotationSet org = (gate.AnnotationSet) bindings.get("org");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule ", "OrgConjOrg1");
+outputAS.add(org.firstNode(), org.lastNode(), "Organization",features);
+outputAS.removeAll(org);
+}
+
+Rule: OrgConjOrg2
+(
+ {Organization}
+ {Token.category == CC, !Token.string == "&"}
+)
+(
+ {CoreName}
+):org
+-->
+ {
+gate.AnnotationSet org = (gate.AnnotationSet) bindings.get("org");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule ", "OrgConjOrg2");
+outputAS.add(org.firstNode(), org.lastNode(), "Organization",features);
+outputAS.removeAll(org);
+}
+
+Rule: OrgConjOrg3
+({CoreName}):org
+(
+	{Token.string == "&"}
+	{Organization}
+):org2
+({Token.category != "POS"})
+
+-->
+{
+gate.AnnotationSet org = (gate.AnnotationSet) bindings.get("org");
+gate.AnnotationSet org2 = (gate.AnnotationSet) bindings.get("org2");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule ", "OrgConjOrg3");
+outputAS.add(org.firstNode(), org2.lastNode(), "Organization",features);
+outputAS.removeAll(org);
+outputAS.removeAll(org2);
+}
+
+Rule: OrgAcronym
+(
+	{Organization}
+	{Token.string == "("}
+	(
+	{Token.orth == "allCaps"}|
+	{Token.string == "&"}|
+	{Token.orth == "upperInitial", Token.length == 1}
+	)[1,3]:orgacronym
+	{Token.string == ")"}
+)
+-->
+{
+gate.AnnotationSet acr = (gate.AnnotationSet) bindings.get("orgacronym");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule ", "OrgAcronym");
+outputAS.add(acr.firstNode(), acr.lastNode(), "Organization",features);
+outputAS.removeAll(acr);
+}
+
+Rule:OrgContext1
+Priority: 1
+// company X
+// company called X
+ {Organization}
+(
+ ({Token.string == ","})?
+
+ (
+   {Token.string == "called"}|
+   {Token.string == "aka"}|
+   {Token.string == "dubbed"}|
+   {Token.string == "named"}|
+   {Token.string == "dba"}|
+   ({Token.string == "known"}{Token.string == "as"})|
+   ({Token.string == "identified"}{Token.string == "as"})|
+   {Token.string == "CALLED"}|
+   {Token.string == "AKA"}|
+   {Token.string == "DUBBED"}|
+   {Token.string == "NAMED"}|
+   {Token.string == "DBA"}|
+   ({Token.string == "KNOWN"}{Token.string == "AS"})|
+   ({Token.string == "IDENTIFIED"}{Token.string == "AS"})
+ )
+ ({CoreName}) :org
+)
+-->
+{
+//System.out.println("OrgContext1 fired");
+gate.AnnotationSet org = (gate.AnnotationSet) bindings.get("org");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule ", "OrgContext1");
+outputAS.add(org.firstNode(), org.lastNode(), "Organization",features);
+outputAS.removeAll(org);
+}
+
+Rule:OrgContext2
+Priority: 1
+// company X
+// company called X
+({CoreName}) :org
+(
+ ({Token.string == ","})?
+
+ (
+   {Token.string == "called"}|
+   {Token.string == "aka"}|
+   {Token.string == "dubbed"}|
+   {Token.string == "named"}|
+   {Token.string == "dba"}|
+   ({Token.string == "known"}{Token.string == "as"})|
+   ({Token.string == "identified"}{Token.string == "as"})|
+   {Token.string == "CALLED"}|
+   {Token.string == "AKA"}|
+   {Token.string == "DUBBED"}|
+   {Token.string == "NAMED"}|
+   {Token.string == "DBA"}|
+   ({Token.string == "KNOWN"}{Token.string == "AS"})|
+   ({Token.string == "IDENTIFIED"}{Token.string == "AS"})
+ )
+ {Organization}
+)
+-->
+{
+//System.out.println("OrgContext1 fired");
+gate.AnnotationSet org = (gate.AnnotationSet) bindings.get("org");
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule ", "OrgContext1");
+outputAS.add(org.firstNode(), org.lastNode(), "Organization",features);
+outputAS.removeAll(org);
+}

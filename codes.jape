@@ -1,0 +1,34 @@
+Phase:	Codes
+Input:  Token Lookup
+Options: control = appelt
+
+Rule: MGRS1
+(
+	(
+	{Token.kind == number, Token.length == "1"} | 
+	{Token.kind == number, Token.length == "2", Token.string < 60} //MGRS grid zone is numbered 1-60
+	)
+	
+	(
+		(
+			{Token.orth == upperInitial, Token.length == "1", Token.string =~ "[CDEFGHJKLMNPQRSTUVWX]"} {Token.orth == allCaps, Token.length == "2"} //if they separate the grid zone from the rest, then there is only one digit followed by 2.
+		)| 
+		{Token.orth == allCaps, Token.length == "3"} // if they string it all together with the 100,000 meter id, then you'll get 3 letters
+	)
+	(
+		(
+			{Token.kind == number, Token.length == "4"} |
+			{Token.kind == number, Token.length == "6"} |
+			{Token.kind == number, Token.length == "8"} |
+			{Token.kind == number, Token.length == "10"}
+		)|
+		(
+			({Token.kind == number, Token.length == "2"} {Token.kind == number, Token.length == "2"}) |
+			({Token.kind == number, Token.length == "3"} {Token.kind == number, Token.length == "3"}) |
+			({Token.kind == number, Token.length == "4"} {Token.kind == number, Token.length == "4"}) |
+			({Token.kind == number, Token.length == "5"} {Token.kind == number, Token.length == "5"})
+		)
+	)
+):mgrs
+-->
+:mgrs.Location = {kind = "mgrs", rule = "MGRS1"}

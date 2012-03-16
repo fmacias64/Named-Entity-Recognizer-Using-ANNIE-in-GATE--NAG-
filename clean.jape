@@ -1,0 +1,23 @@
+Phase:	Clean
+Input:  TempDate TempTime TempYear TempZone Street Postcode TempIdentifier TempSpecs Vehicle Organization Facility Vessel
+Options: control = appelt
+
+Rule:CleanTempAnnotations
+(
+ {Organization.type == "orgstub"}|
+ {Facility.type == "facstub"}|
+ {Vessel.type == "vesstub"}|
+ {TempDate}|
+ {TempTime}|
+ {TempYear}|
+ {TempZone}|
+ {Street}|
+ {Postcode}|
+ {TempIdentifier}|
+ {TempSpecs}
+):temp
+-->
+{
+ gate.AnnotationSet temp = (gate.AnnotationSet)bindings.get("temp");
+ outputAS.removeAll(temp);
+}

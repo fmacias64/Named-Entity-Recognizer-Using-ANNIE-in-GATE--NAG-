@@ -1,0 +1,59 @@
+Phase:	ReduceTitle
+Input: JobTitle Title
+Options: control = appelt
+
+Rule: ReduceJobTitle
+(
+{JobTitle}
+):nuke
+-->
+{
+gate.AnnotationSet nukeAS = (gate.AnnotationSet)bindings.get("nuke");
+gate.AnnotationSet XtagAS = inputAS.get("JobTitle", nukeAS.firstNode().getOffset(), nukeAS.lastNode().getOffset());
+
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule", "ReduceJobTitle");
+if (XtagAS != null && nukeAS != null) {
+	if ((nukeAS.firstNode().getOffset() != XtagAS.firstNode().getOffset()) || (nukeAS.lastNode().getOffset() != XtagAS.lastNode().getOffset())) {
+		if ((nukeAS.firstNode().getOffset() <= XtagAS.firstNode().getOffset()) && (nukeAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset())) {
+			outputAS.add(nukeAS.firstNode(),nukeAS.lastNode(),"JobTitle",features);
+		} else if ((nukeAS.firstNode().getOffset() >= XtagAS.firstNode().getOffset()) && (nukeAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset())) {
+			outputAS.add(XtagAS.firstNode(),nukeAS.lastNode(),"JobTitle",features);
+		} else if ((nukeAS.firstNode().getOffset() <= XtagAS.firstNode().getOffset()) && (nukeAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+			outputAS.add(nukeAS.firstNode(),XtagAS.lastNode(),"JobTitle",features);
+		} else if ((nukeAS.firstNode().getOffset() >= XtagAS.firstNode().getOffset()) && (nukeAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+			outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"JobTitle",features);
+		}
+		outputAS.removeAll(XtagAS);
+		outputAS.removeAll(nukeAS);
+	}
+}
+}
+
+Rule: ReduceTitle
+(
+{Title}
+):nuke
+-->
+{
+gate.AnnotationSet nukeAS = (gate.AnnotationSet)bindings.get("nuke");
+gate.AnnotationSet XtagAS = inputAS.get("Title", nukeAS.firstNode().getOffset(), nukeAS.lastNode().getOffset());
+
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("rule", "ReduceTitle");
+if (XtagAS != null && nukeAS != null) {
+	if ((nukeAS.firstNode().getOffset() != XtagAS.firstNode().getOffset()) || (nukeAS.lastNode().getOffset() != XtagAS.lastNode().getOffset())) {
+		if ((nukeAS.firstNode().getOffset() <= XtagAS.firstNode().getOffset()) && (nukeAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset())) {
+			outputAS.add(nukeAS.firstNode(),nukeAS.lastNode(),"Title",features);
+		} else if ((nukeAS.firstNode().getOffset() >= XtagAS.firstNode().getOffset()) && (nukeAS.lastNode().getOffset() >= XtagAS.lastNode().getOffset())) {
+			outputAS.add(XtagAS.firstNode(),nukeAS.lastNode(),"Title",features);
+		} else if ((nukeAS.firstNode().getOffset() <= XtagAS.firstNode().getOffset()) && (nukeAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+			outputAS.add(nukeAS.firstNode(),XtagAS.lastNode(),"Title",features);
+		} else if ((nukeAS.firstNode().getOffset() >= XtagAS.firstNode().getOffset()) && (nukeAS.lastNode().getOffset() <= XtagAS.lastNode().getOffset())) {
+			outputAS.add(XtagAS.firstNode(),XtagAS.lastNode(),"Title",features);
+		}
+		outputAS.removeAll(XtagAS);
+		outputAS.removeAll(nukeAS);
+	}
+}
+}

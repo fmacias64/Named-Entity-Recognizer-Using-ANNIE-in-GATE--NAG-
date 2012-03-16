@@ -1,0 +1,12 @@
+Phase:	Unknown
+Input: CoreName
+Options: control = appelt
+
+Rule:Unknown
+Priority: 50
+( 
+ {CoreName}
+) 
+:unknown
+-->
+ :unknown.Unknown = {kind = "PN", rule = Unknown}
