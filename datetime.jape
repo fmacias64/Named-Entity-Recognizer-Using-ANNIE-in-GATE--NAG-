@@ -1,3 +1,11 @@
+/*
+*
+* Copyright (c) 2012, Jeffrey D. Mershon.
+*
+*  This is free software, licensed under GPL v3.
+* 
+*/
+
 Imports: { 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

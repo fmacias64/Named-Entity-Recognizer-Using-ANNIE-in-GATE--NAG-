@@ -1,3 +1,11 @@
+/*
+*
+* Copyright (c) 2012, Jeffrey D. Mershon.
+*
+*  This is free software, licensed under GPL v3.
+* 
+*/
+
 Phase:	First
 Input: Token Lookup Split
 Options: control = appelt debug = false

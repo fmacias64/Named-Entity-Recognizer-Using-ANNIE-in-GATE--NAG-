@@ -1,3 +1,11 @@
+/*
+*
+* Copyright (c) 2012, Jeffrey D. Mershon.
+*
+*  This is free software, licensed under GPL v3.
+* 
+*/
+
 Phase:	Clean
 Input:  TempDate TempTime TempYear TempZone Street Postcode TempIdentifier TempSpecs Vehicle Organization Facility Vessel
 Options: control = appelt
