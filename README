@@ -1,8 +1,30 @@
-The background for this  tool can be found in 3 blog posts. the first two form the core of the documentation:
+NAG is a Named-Entity Recognizer that combines rule and statistical-based approaches to named-entity recognition.
+
+The background for NAG can be found in 3 blog posts. the first two form the core of the current documentation:
 
 http://jeffmershon.wordpress.com/2011/05/12/a-different-approach-to-named-entity-recognition-using-annie-in-gate/
 http://jeffmershon.wordpress.com/2011/06/02/named-entity-recognition-using-annie-in-gate-part-2/
 
-The third post describes a couple of useful perl utilities:
+A third post describes a couple of useful perl utilities:
 
 http://jeffmershon.wordpress.com/2011/09/28/utility-scripts-for-named-entity-recognizer-follow-up-post/
+
+It is licensed under GPL v3. The text of that license is included in the file license.txt.
+
+Note that currently, several ANNIE jape files that are part of the GATE distribution are included. They are copyrighted and licensed separately than the files developed for NAG.
+
+These files are included to provide a complete set of baseline jape files needed for NAG to function.
+
+To get started:
+1. Install GATE
+2. Copy this project to your machine.
+3. Run the GATE Developer GUI
+4. Create a New Processing Resource (Type: Jape Transducer, Name:NAG) pointing to main.jape in whatever directory you put the project files
+5. Create a New Processing Resource (Type: Gazetteer, Name: Your Gazetteer) pointing to lists.def in whatever directory you put the project files
+6. Create a language resource (either a corpus or single document).
+7. Create an application. You need:
+	Document Reset
+	ANNIE_English_Tokeniser
+	ANNIE_Sentence_Splitter
+	ANNIE_POS_Tagger
+	Your Gazetteer
